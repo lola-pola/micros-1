@@ -28,14 +28,14 @@ jobs:
                 client-id: ${{ secrets.AZURE_CLIENT_ID }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            - name: helm login 
+              run: helm registry login ${{ secrets.URL }} --username ${{ secrets.USER_NAME }} --password ${{ secrets.ACR_PASSWORD }}                
             - name: bump version chart
               run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  
               run: "sed -i 's/tag: [0-9]/tag: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/values.yaml"              
             - name: helm dep build . && helm package 
               run: helm dep build  micros-1  && helm package  micros-1 
-            - name: helm login 
-              run: helm registry login ${{ secrets.URL }} --username ${{ secrets.USER_NAME }} --password ${{ secrets.ACR_PASSWORD }}
             - name: helm push 
               run: helm push micros-1-${{ env.CONTAINER_NAME_VERSION }}.tgz ${{ secrets.CHART_URL }}
             - name: Build and push image to ACR

@@ -29,7 +29,7 @@ jobs:
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - name: helm login 
-              run: helm registry login ${{ secrets.URL }} --username ${{ secrets.USER_NAME }} --password ${{ secrets.ACR_PASSWORD }}                
+              run: helm registry login ${{ secrets.ATERA_ARC_URL }} --username ${{ secrets.ACR_ACCESS }} --password ${{ secrets.ACR_SEC }}                
             - name: bump version chart
               run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  

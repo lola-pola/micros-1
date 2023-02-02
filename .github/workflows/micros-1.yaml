@@ -33,7 +33,7 @@ jobs:
             - name: bump version of image  
               run: "sed -i 's/tag: [0-9]/tag: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/values.yaml"              
             - name: helm dep build . && helm package 
-              run: helm package micros-1
+              run: helm dep build  micros-1  && helm package  micros-1 
             - name: helm login 
               run: helm registry login ${{ secrets.URL }} --username ${{ secrets.USER_NAME }} --password ${{ secrets.ACR_PASSWORD }}
             - name: helm push 

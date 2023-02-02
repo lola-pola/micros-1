@@ -1,0 +1,6 @@
+dependencies:
+- name: generic
+  repository: oci://atera.azurecr.io/helm
+  version: 0.1.0
+digest: sha256:578e28bd292513141cebe82e704d4dc9485196f0770d7da67a86cdecab18970e
+generated: "2023-02-02T09:28:56.797746+02:00"

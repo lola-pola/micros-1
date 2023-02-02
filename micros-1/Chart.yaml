@@ -1,10 +1,10 @@
 apiVersion: v2
-name: test
+name: micros-1
 description: A Helm chart for Kubernetes
 
 dependencies:
 - name: generic
-  alias: test
+  alias: micros-1
   version: "0.1.0"
   repository: "oci://atera.azurecr.io/helm"
 

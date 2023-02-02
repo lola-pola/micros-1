@@ -32,14 +32,14 @@ jobs:
               run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  
               run: "sed -i 's/tag: [0-9]/tag: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/values.yaml"              
-            - name: helm package 
+            - name: helm dep build . && helm package 
               run: helm package micros-1
             - name: helm login 
               run: helm registry login ${{ secrets.URL }} --username ${{ secrets.USER_NAME }} --password ${{ secrets.ACR_PASSWORD }}
             - name: helm push 
               run: helm push micros-1-${{ env.CONTAINER_NAME_VERSION }}.tgz ${{ secrets.CHART_URL }}
             - name: Build and push image to ACR
-              run: az acr build --image ${{ env.CONTAINER_NAME }}:CONTAINER_NAME_VERSION --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./Dockerfile ./
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ env.CONTAINER_NAME_VERSION }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./Dockerfile ./
     deploy:
         permissions:
             actions: read
@@ -62,4 +62,4 @@ jobs:
                 cluster-name: ${{ env.CLUSTER_NAME }}
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
             - name: Deploy application
-              run: helm upgrade --wait -i -f ${{ env.CHART_OVERRIDE_PATH }}  automated-deployment ${{ env.CHART_PATH }}
+              run: helm upgrade --wait -i -f ${{ env.CHART_OVERRIDE_PATH }} --version 0.1.${{ env.CONTAINER_NAME_VERSION }} automated-deployment ${{ secrets.ATERA_URL_CHART }}${{ env.CHART_PATH }}

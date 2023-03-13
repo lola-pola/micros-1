@@ -5,14 +5,15 @@ name: micros-1
             - main
     workflow_dispatch: {}
 env:
-    ACR_RESOURCE_GROUP: atera-k8s-demo
-    AZURE_CONTAINER_REGISTRY: atera
+    ACR_RESOURCE_GROUP: elhays
+    AZURE_CONTAINER_REGISTRY: databasecni
     CHART_OVERRIDE_PATH: ./micros-1/values.yaml
-    CHART_OVERRIDES: ""
+    CHART_OVERRIDES: image.repository=databasecni.azurecr.io/micros-1,image.tag=${{ github.sha }}
     CHART_PATH: ./micros-1
-    CLUSTER_NAME: atera-k8s-demo
-    CLUSTER_RESOURCE_GROUP: atera-k8s-demo
+    CLUSTER_NAME: database-cni
+    CLUSTER_RESOURCE_GROUP: elhays
     CONTAINER_NAME: micros-1
+    HELM_ARC_URL: databasecni.azurecr.io
     CONTAINER_NAME_VERSION: ${{github.run_number}}
 jobs:
     buildImage:
@@ -28,8 +29,9 @@ jobs:
                 client-id: ${{ secrets.AZURE_CLIENT_ID }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                
             - name: helm login 
-              run: helm registry login ${{ secrets.ATERA_ARC_URL }} --username ${{ secrets.ACR_ACCESS }} --password ${{ secrets.ACR_SEC }}                
+              run: helm registry login ${{ secrets.HELM_ARC_URL }} --username ${{ secrets.HELM_ACR_ACCESS }} --password ${{ secrets.HELM_ACR_SEC }}                
             - name: bump version chart
               run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  
@@ -37,9 +39,12 @@ jobs:
             - name: helm dep build . && helm package 
               run: helm dep build micros-1 && helm package micros-1 
             - name: helm push 
-              run: helm push micros-1-${{ env.CONTAINER_NAME_VERSION }}.tgz oci://${{ secrets.ATERA_ARC_URL }}/helm 
-            - name: Build and push image to ${{ secrets.ATERA_ARC_URL }}
+              run: helm push micros-1-${{ env.CONTAINER_NAME_VERSION }}.tgz oci://${{ secrets.HELM_ARC_URL }}/helm 
+            - name: Build and push image to ${{ secrets.HELM_ARC_URL }}
               run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ env.CONTAINER_NAME_VERSION }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./Dockerfile ./
+
+            - name: Build and push image to ACR
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./Dockerfile ./
     deploy:
         permissions:
             actions: read
@@ -56,10 +61,16 @@ jobs:
                 client-id: ${{ secrets.AZURE_CLIENT_ID }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            - uses: azure/use-kubelogin@v1
+              name: Set up kubelogin for non-interactive login
+              with:
+                kubelogin-version: v0.0.25
             - uses: azure/aks-set-context@v3
               name: Get K8s context
               with:
+                admin: "false"
                 cluster-name: ${{ env.CLUSTER_NAME }}
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+                use-kubelogin: "true"
             - name: Deploy application
-              run: helm upgrade --wait -i -f ${{ env.CHART_OVERRIDE_PATH }} --version 0.1.${{ env.CONTAINER_NAME_VERSION }} automated-deployment ${{ secrets.ATERA_URL_CHART }}${{ env.CHART_PATH }}
+              run: helm upgrade --wait -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-deployment ${{ env.CHART_PATH }}

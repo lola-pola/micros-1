@@ -3,7 +3,7 @@ name: micros-1
 description: A Helm chart for Kubernetes
 
 dependencies:
-- name: generic
+- name: generic-helm-reuse
   alias: micros-1
   version: "0.0.9"
   repository: "oci://databasecni.azurecr.io/helm"

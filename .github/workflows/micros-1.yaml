@@ -31,7 +31,7 @@ jobs:
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
                 
             - name: helm login 
-              run: helm registry login ${{ secrets.HELM_ARC_URL }} --password ${{ secrets.HELM_ACR_SEC }} --username ${{ secrets.HELM_ACR_ACCESS }}
+              run: helm registry login ${{ env.HELM_ARC_URL }} --password ${{ secrets.HELM_ACR_SEC }} --username ${{ secrets.HELM_ACR_ACCESS }}
             - name: bump version chart
               run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  

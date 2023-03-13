@@ -5,7 +5,7 @@ description: A Helm chart for Kubernetes
 dependencies:
 - name: generic
   alias: micros-1
-  version: "11.11.11"
+  version: "0.0.9"
   repository: "oci://databasecni.azurecr.io/helm"
 
 # A chart can be either an 'application' or a 'library' chart.

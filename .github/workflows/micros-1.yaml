@@ -8,7 +8,7 @@ env:
     ACR_RESOURCE_GROUP: elhays
     AZURE_CONTAINER_REGISTRY: databasecni
     CHART_OVERRIDE_PATH: ./micros-1/values.yaml
-    CHART_OVERRIDES: image.repository=databasecni.azurecr.io/micros-1,image.tag=${{ github.sha }}
+    CHART_OVERRIDES: image.repository=databasecni.azurecr.io/micros-1,image.tag=${{github.run_number}}
     CHART_PATH: ./micros-1
     CLUSTER_NAME: database-cni
     CLUSTER_RESOURCE_GROUP: elhays
@@ -73,4 +73,4 @@ jobs:
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
             - name: Deploy application
-              run: helm upgrade -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-micros-1 micros-1/micros-1-25.tgz
+              run: helm upgrade -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-micros-1 micros-1-${{github.run_number}}.tgz

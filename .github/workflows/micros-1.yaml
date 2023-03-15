@@ -72,5 +72,7 @@ jobs:
                 cluster-name: ${{ env.CLUSTER_NAME }}
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
+            - name: helm login 
+              run: helm registry login ${{ env.HELM_ARC_URL }} --password ${{ secrets.HELM_ACR_SEC }} --username ${{ secrets.HELM_ACR_ACCESS }}
             - name: Deploy application
               run: helm upgrade -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-micros-1 oci://${{ env.HELM_ARC_URL }}/helm/micros-1 --version 0.0.${{ env.CONTAINER_NAME_VERSION }}

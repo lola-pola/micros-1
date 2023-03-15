@@ -33,7 +33,7 @@ jobs:
             - name: helm login 
               run: helm registry login ${{ env.HELM_ARC_URL }} --password ${{ secrets.HELM_ACR_SEC }} --username ${{ secrets.HELM_ACR_ACCESS }}
             - name: bump version chart
-              run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
+              run: "sed -i 's/version: [0-9].[0-9].[0-9]/version: '0.0.${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/Chart.yaml"
             - name: bump version of image  
               run: "sed -i 's/tag: [0-9]/tag: '${{ env.CONTAINER_NAME_VERSION }}'/g' micros-1/values.yaml"              
             - name: helm dep build . && helm package 
@@ -73,4 +73,4 @@ jobs:
                 resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
                 use-kubelogin: "true"
             - name: Deploy application
-              run: helm upgrade -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-micros-1 micros-1-${{github.run_number}}.tgz
+              run: helm upgrade -i -f ${{ env.CHART_OVERRIDE_PATH }} --set ${{ env.CHART_OVERRIDES }} automated-micros-1 oci://${{ env.HELM_ARC_URL }}/helm/micros-1 --version 0.0.${{ env.CONTAINER_NAME_VERSION }}

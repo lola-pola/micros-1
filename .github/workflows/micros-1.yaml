@@ -39,7 +39,7 @@ jobs:
             - name: helm dep build . && helm package 
               run: helm dep build micros-1 && helm package micros-1 
             - name: helm push 
-              run: helm push micros-1-${{ env.CONTAINER_NAME_VERSION }}.tgz oci://${{ env.HELM_ARC_URL }}/helm 
+              run: helm push micros-1-0.0.${{ env.CONTAINER_NAME_VERSION }}.tgz oci://${{ env.HELM_ARC_URL }}/helm 
             - name: Build and push image to ${{ secrets.HELM_ARC_URL }}
               run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ env.CONTAINER_NAME_VERSION }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./Dockerfile ./
 

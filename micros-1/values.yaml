@@ -38,6 +38,7 @@ micros-1:
 
   service:
     type: ClusterIP
+    dnsName: micros-1-generic-chart-example
     port: 80
 
   ingress:

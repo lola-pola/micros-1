@@ -37,7 +37,7 @@ micros-1:
     # runAsUser: 1000
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     dnsName: micros-1-generic-chart-example
     port: 80
 
